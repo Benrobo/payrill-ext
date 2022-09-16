@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" style="min-height:600px; width: 360px;">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="theme-color" content="#FED200">
+        <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+        <title>Ecart</title>
+        <!-- CSS Files -->
+        <link rel="stylesheet" href="./assets/css/bootstrap.css"/>
+        <link rel="stylesheet" href="./assets/css/style.css"/>
+        <link rel="stylesheet" href="./assets/css/swiper.css"/>
+        <link rel="stylesheet" href="./assets/css/attention.css"/>
+        <!-- JS Files -->
+        <script src="./assets/js/swiper.js"></script>
+        <script src="./assets/js/nodb.js"></script>
+        <script src="./assets/js/attention.js"></script>
+        <script src="./assets/js/moment.js"></script>
+    </head>
+    <body>
+        <!-- Loader -->
+        <div id="load_cov">
+            <div class="lds-roller" id="loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <!-- Success Payment Modal -->
+        <div id="success">
+            <span onclick="this.parentElement.style.display = 'none'">&times</span>
+            <img src="./assets/img/illus/success.svg">
+            <h1>Payment Successful</h1>
+            <p>
+                Thank you for purchasing.<br>
+                Your payment was Successful<font class="green">!</font>
+            </p>
+            <div onclick="seeDetails()">See Details</div>
+        </div>
+        <!-- Page1 -->
+        <div id="page1" class="page" style="display:block">
+            <!-- Tabs -->
+            <div class="tabs">
+                <!-- homeTab -->
+                <div id="homeTab" class="tabcontent" style="display:block">
+                    <div id="ecarts">
+                        <div class="noecart"><img src="./assets/img/icon/cart.svg"><p>No Ecarts</p></div>
+                    </div>
+                    <img id="addCart" src="./assets/img/icon/addcart.png">
+                </div>
+                <!-- CartTab -->
+                <div id="cartTab" class="tabcontent">
+                    <p>Ecart</p>
+                    <div id="cartList">
+                    </div>
+                    <div class="totalCov darkmode-ignore">
+                        <span>Total</span>
+                        <p id="total">$0</p>
+                    </div>
+                </div>
+                <!-- CardTab -->
+                <div id="cardTab" class="tabcontent">
+                    <div id="cardSwipe">
+                        <div class="swiper-wrapper">
+                            <div class="cardForm swiper-slide">
+                                <div class="paymentPortal">
+                                    <img src="./assets/img/icon/rapyd.webp">
+                                    <p>Payment</p>
+                                </div>
+                                <div class="cardBody">
+                                    <div class="inputHolder">
+                                        <p>Card Name</p>
+                                        <input id="cardName" pattern="^.{5,100}$" maxlength="100" autocomplete="cc-name" required>
+                                    </div>
+                                    <div class="inputHolder">
+                                        <p>Card Number</p>
+                                        <input id="card" minlength="19" pattern="\b(?:\d[ -]*?){16,19}\b" autocomplete="cc-number" required>
+                                    </div>
+                                    <div class="inputHolder">
+                                        <p>Password</p>
+                                        <input id="password" type="password" minlength="8" required>
+                                    </div>
+                                    <div class="cardBottom">
+                                        <div class="inputHolder">
+                                            <p>CVV2</p>
+                                            <input id="cvv" minlength="3" maxlength="4" pattern="[0-9.]+" autocomplete="cc-csc" min="100" max="9999" required>
+                                        </div>
+                                        <div class="inputHolder">
+                                            <p>Expiry Date</p>
+                                            <input id="expiryDate" pattern="^.{5,5}$" maxlength="5" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cardForm swiper-slide">
+                                <div class="inputHolder">
+                                    <p>Billing Address</p>
+                                    <input id="address" minlength="10" autocomplete="street-address" required>
+                                </div>
+                                <div class="inputHolder">
+                                    <p>City</p>
+                                    <input id="city" autocomplete="address-level2" required>
+                                </div>
+                                <div class="inputHolder">
+                                    <p>State</p>
+                                    <input id="state" autocomplete="address-level1" required>
+                                </div>
+                                <div class="inputHolder">
+                                    <p>Zip Code</p>
+                                    <input id="zip" maxlength="6" autocomplete="postal-code" pattern="^\d{5,6}(?:[-\s]\d{4})?$" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                    <div id="payNow">
+                        Pay Now<p id="payTo"></p>
+                    </div>
+                </div>
+                <!-- SettingTab -->
+                <div id="settingTab" class="tabcontent">
+                    <div class="first">
+                        <img src="./assets/img/logo/logo.png">
+                        <h3 class="darkmode-ignore">Ecart</h3>
+                    </div>
+                    <div class="section">PREFERENCE</div>
+                    <div class="option">
+                        <img id="moon" class="darkmode-ignore" src="./assets/img/icon/moon.svg">
+                        <span>Dark Mode</span>
+                        <input type="checkbox" id="switch">
+                        <label for="switch">Toggle</label>
+                    </div>
+                    <div class="option" id="installApp">
+                        <img id="install" class="darkmode-ignore" src="./assets/img/icon/install.svg">
+                        <span>Install App</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tab">
+                <div class="tabholder">
+                    <img id="qrBtn" class="tablinks active" data-type="homeTab" src="./assets/img/icon/home.png">
+                </div>
+                <div class="tabholder">
+                    <img class="tablinks" data-type="cartTab" src="./assets/img/icon/cart.svg">
+                </div>
+                <div class="tabholder">
+                    <img class="tablinks" data-type="cardTab" src="./assets/img/icon/card.svg">
+                </div>
+                <div class="tabholder">
+                    <img class="tablinks" data-type="settingTab" src="./assets/img/icon/setting.svg">
+                </div>
+            </div>
+        </div>
+        <!-- page2 -->
+        <div id="page2" class="page">
+            <div id="top">
+                <img id="back" class="back" src="./assets/img/icon/back.svg">
+            </div>
+            <div id="itemSwipe">
+                <div class="swiper-wrapper"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+            <p id="itemName"></p>
+            <div class="itemInfos">
+                <div class="itemInfo">
+                    <div class="itemOption">Amount</div>
+                    <div class="itemSelect">
+                        <img id="decrement" onclick="decrement()" class="sideBtn" src="./assets/img/icon/minus.svg" style="background: red;">
+                        <div id="amountSwipe">
+                            <div id="eachOption">1</div>
+                        </div>
+                        <img id="increment" onclick="increment()" class="sideBtn" src="./assets/img/icon/plus.svg" style="background: green;">
+                    </div>
+                </div>
+            </div>
+            <div id="addToCart" class="darkmode-ignore">
+                <p id="itemPrice">$0</p>
+                <div id="add">
+                    <img src="./assets/img/icon/cart.svg">
+                    <p>Add to Cart</p>
+                </div>
+            </div>
+        </div>
+        <!-- page3 -->
+        <div id="page3" class="page">
+            <div class="close" onclick="openPage('page1')">&times</div>
+            <div id="summary"></div>
+            <div id="payBtn">Confirm Payment</div>
+        </div>
+        <!-- page4 -->
+        <div id="page4" class="page">
+            <div id="print">
+                <div class="second">
+                    <img src="./assets/img/logo/logo.png">
+                    <h3 class="darkmode-ignore">Ecart</h3>
+                </div>
+                <table id="receipt">
+                    <tr>
+                        <th class="left">Product</th>
+                        <th>Quantity</th>
+                        <th class="right">Price</th>
+                    </tr>
+                </table>
+            </div>
+            <div id="save">Save Reciept</div>
+        </div>
+        <script src="./assets/js/script.js"></script>
+    </body>
+</html>

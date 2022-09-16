@@ -1,0 +1,49 @@
+{
+    "manifest_version": 3,
+    "name": "Ecart",
+    "version": "1.0",
+    "description": "Ecart Shopping",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "icons": {
+        "32": "icons/icon.png",
+        "128": "icons/128.png"
+    },
+    "action": {
+        "default_popup": "public/index.html",
+        "default_title": "Ecart",
+        "default_icon": {
+            "32": "icons/icon.png",
+            "128": "icons/128.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/content.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "activeTab",
+        "storage",
+        "scripting"
+    ],
+    "background": {
+        "service_worker": "js/background.js",
+        "type": "module"
+    },
+    "externally_connectable": {
+        "ids": [
+            "*"
+        ],
+        "matches": [
+            "*://jumia.localhost/*"
+        ],
+        "accepts_tls_channel_id": false
+    }
+}
