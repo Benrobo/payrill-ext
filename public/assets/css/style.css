@@ -778,7 +778,7 @@ label:active:after {
 .cardForm {
     height: 420px !important;
     width: -webkit-fill-available !important;
-    margin: 20px;
+    margin: 10px;
     border-radius: 20px;
     border: 1px solid var(--gray);
     display: flex;
@@ -882,14 +882,14 @@ label:active:after {
     text-align: center;
     font-weight: bolder;
     isolation: isolate;
-    margin-top: 10px;
+    margin-top: 0px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-content: center;
     justify-content: center;
     align-items: center;
-}
+cursor: pointer;color: white;}
 
 .cardForm input:not(:focus):invalid {
     background-color: #FFD9D9;
@@ -967,7 +967,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 .summarySub:last-child {
     color: white;
     font-family: 'poppins';
-}
+margin-top: 50px;}
 
 #page3 {
 }
@@ -975,7 +975,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 #page3 .close {
     float: left;
     background: #e85555;
-    color: red;
+    color: white;
     border-radius: 100%;
     margin: 10px;
     height: 0px;
@@ -1003,8 +1003,8 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     font-weight: bold;
     color: inherit;
     text-align: center;
-    color: var(--dark);
-}
+    color: white;
+cursor: pointer;}
 
 #success {
     box-sizing: content-box;
@@ -1025,7 +1025,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 #success span {
     float: right;
     background: #e85555;
-    color: red;
+    color: white;
     border-radius: 100%;
     margin: 10px;
     height: 0px;
@@ -1070,7 +1070,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     padding: 15px 100px;
     border-radius: 10px;
     color: white;
-}
+cursor: pointer;}
 
 .green {color: #92E3A9;font-weight: bolder;font-size: x-large;}
 
@@ -1104,7 +1104,7 @@ th {
 .second img {
     height: 100px;
     width: 100px;
-}
+margin: 20px;}
 
 .second h3 {
     margin: 0px;
@@ -1131,7 +1131,7 @@ th {
     transform: translate(-50%, -50%);
     left: 50%;
     bottom: 0%;
-}
+cursor: pointer;}
 
 .right {
     text-align: end;
@@ -1198,6 +1198,10 @@ border: 3px solid var(--success);}
     bottom: -1px;
     cursor: pointer;
 outline: none;}
+
+.selected button{
+    
+background: var(--success);border-radius: 0px;}
 
 .ecart p{
     margin: 5px;

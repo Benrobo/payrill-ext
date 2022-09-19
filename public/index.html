@@ -34,14 +34,14 @@
         </div>
         <!-- Success Payment Modal -->
         <div id="success">
-            <span onclick="this.parentElement.style.display = 'none'">&times</span>
+            <span id="back3">&times</span>
             <img src="./assets/img/illus/success.svg">
             <h1>Payment Successful</h1>
             <p>
                 Thank you for purchasing.<br>
                 Your payment was Successful<font class="green">!</font>
             </p>
-            <div onclick="seeDetails()">See Details</div>
+            <div id="details">Success</div>
         </div>
         <!-- Page1 -->
         <div id="page1" class="page" style="display:block">
@@ -76,24 +76,24 @@
                                 <div class="cardBody">
                                     <div class="inputHolder">
                                         <p>Card Name</p>
-                                        <input id="cardName" pattern="^.{5,100}$" maxlength="100" autocomplete="cc-name" required>
+                                        <input id="cardName" value="John Doe" pattern="^.{5,100}$" maxlength="100" autocomplete="cc-name" required>
                                     </div>
                                     <div class="inputHolder">
                                         <p>Card Number</p>
-                                        <input id="card" minlength="19" pattern="\b(?:\d[ -]*?){16,19}\b" autocomplete="cc-number" required>
+                                        <input id="card" value="4539 9222 8821 1219" minlength="19" pattern="\b(?:\d[ -]*?){16,19}\b" autocomplete="cc-number" required>
                                     </div>
                                     <div class="inputHolder">
                                         <p>Password</p>
-                                        <input id="password" type="password" minlength="8" required>
+                                        <input id="password" value="password" type="password" minlength="8" required>
                                     </div>
                                     <div class="cardBottom">
                                         <div class="inputHolder">
                                             <p>CVV2</p>
-                                            <input id="cvv" minlength="3" maxlength="4" pattern="[0-9.]+" autocomplete="cc-csc" min="100" max="9999" required>
+                                            <input id="cvv" value="123" minlength="3" maxlength="4" pattern="[0-9.]+" autocomplete="cc-csc" min="100" max="9999" required>
                                         </div>
                                         <div class="inputHolder">
                                             <p>Expiry Date</p>
-                                            <input id="expiryDate" pattern="^.{5,5}$" maxlength="5" required>
+                                            <input id="expiryDate" value="11/25" pattern="^.{5,5}$" maxlength="5" required>
                                         </div>
                                     </div>
                                 </div>
@@ -171,7 +171,7 @@
             <p id="itemName"></p>
             <div class="itemInfos">
                 <div class="itemInfo">
-                    <div class="itemOption">Amount</div>
+                    <div class="itemOption">Quantity</div>
                     <div class="itemSelect">
                         <img id="decrement" onclick="decrement()" class="sideBtn" src="./assets/img/icon/minus.svg" style="background: red;">
                         <div id="amountSwipe">
@@ -191,7 +191,7 @@
         </div>
         <!-- page3 -->
         <div id="page3" class="page">
-            <div class="close" onclick="openPage('page1')">&times</div>
+            <div id="back2" class="close">&times</div>
             <div id="summary"></div>
             <div id="payBtn">Confirm Payment</div>
         </div>
@@ -210,7 +210,7 @@
                     </tr>
                 </table>
             </div>
-            <div id="save">Save Reciept</div>
+            <div id="save">Invoice</div>
         </div>
         <script src="./assets/js/script.js"></script>
     </body>

@@ -1,8 +1,9 @@
-const api = "http://192.168.43.74:8080";
+const api = "https://api.payrill.app"; // "http://localhost:8080"; // "http://192.168.100.74:8080";
+let db;
 
 //Create DB for storing cart items
 
-let db = new NOdb({
+db = new NOdb({
     database: "EcartDB",
     path: "./EcartDB.nodb",
     encrypt: false,
@@ -13,10 +14,12 @@ db.query("CREATE TABLE ecart(ecartId,name,paid,active)");
 
 byId("ecarts").innerHTML = `<div class="noecart"><img src="./assets/img/icon/cart.svg"><p>No Ecarts</p></div>`;
 byId("cartList").innerHTML = "";
+showEcarts();
+createCartList();
 
 async function createFirstCart() {
     let result = await ajax("POST", "/api/ecart/create", {
-        name: "First " + (storeName || "") + " Ecart"
+        name: "First Ecart"
     })
     let json = await result.json();
     db.query(`INSERT INTO ecart VALUES('${json.data.ecart}','${json.data.name}',false,true)`);
@@ -25,34 +28,51 @@ async function createFirstCart() {
 
 // Show Ecarts
 function showEcarts() {
-    db.query("SELECT * FROM ecart ORDER BY id DESC");
-    let ecarts = byId("ecarts");
-    ecarts.innerHTML = "";
-    if (!db.error && db.length != 0) {
-        db.result.ecartId.forEach(function(id, i) {
-            let active = db.result.active[i];
-            if (active) {
-                active = "selected"
-            } else {
-                active = "";
-            }
-            let ecart = `<div id="ecart_${id}" class="ecart ${active}">
+    try {
+        db.query("SELECT * FROM ecart ORDER BY id DESC");
+        let ecarts = byId("ecarts");
+        ecarts.innerHTML = "";
+        if (!db.error && db.length != 0) {
+            db.result.ecartId.forEach(function(id, i) {
+                let active = db.result.active[i];
+                if (active) {
+                    active = "selected"
+                } else {
+                    active = "";
+                }
+                let ecart = `<div id="ecart_${id}" class="ecart ${active}">
                             <img src="./assets/img/icon/cart.svg">
                             <p>${db.result.name[i]}</p>
-                            <button class="checkout" data-ecartId="${db.result.ecartId[i]}">Checkout</button>
+                            <button class="checkout" data-ecartId="${db.result.ecartId[i]}">Transfer</button>
                         </div>`
-            ecarts.innerHTML += ecart;
-        })
-        db.result.ecartId.forEach(function(id, i) {
-            let elem = document.getElementById("ecart_" + id);
-            elem.onclick = function() {
-                setActiveEcart(id);
-            }
-        })
-    } else {
-        ecarts.innerHTML = `<div class="noecart"><img src="./assets/img/icon/cart.svg"><p>No Ecarts</p></div>`
-    }
+                ecarts.innerHTML += ecart;
+            })
+            db.result.ecartId.forEach(function(id, i) {
+                let elem = document.getElementById("ecart_" + id);
+                elem.onclick = function() {
+                    setActiveEcart(id);
+                }
+            })
+            let transfers = document.querySelectorAll(".checkout");
+            transfers.forEach(function(transfer){
+                transfer.onclick = function() {
+                    let ecartId = transfer.dataset.ecartid;
+                    modal(ecartId, "Ecart Import Code");
+                    copyToClipboard(ecartId);
+                }
+            })
+        } else {
+            ecarts.innerHTML = `<div class="noecart"><img src="./assets/img/icon/cart.svg"><p>No Ecarts</p></div>`
+        }
+    } catch (error) {}
+}
 
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    console.log('Async: Copying to clipboard was successful!');
+  }, function(err) {
+    console.error('Async: Could not copy text: ', err);
+  });
 }
 
 function updateBadge(text) {
@@ -63,8 +83,8 @@ function updateBadge(text) {
         let tabId = tabs[0].id;
         let color = "red";
 
-        if(Number(text)){
-            if(Number(text) != 0){
+        if (Number(text)) {
+            if (Number(text) != 0) {
                 color = "green";
             }
         }
@@ -112,9 +132,6 @@ async function setActiveEcart(id) {
     }, 500);
 }
 
-showEcarts();
-createCartList();
-
 //Get element by id shortcut
 function byId(id) {
     return document.getElementById(id);
@@ -127,6 +144,12 @@ tabs.forEach(function(tab) {
         let elem = e.target;
         let type = elem.dataset.type;
         openTab(e, type);
+
+        if (type == "homeTab") {
+            showEcarts();
+        }else if(type == "cartTab"){
+            createCartList();
+        }
     }
 })
 
@@ -279,6 +302,10 @@ async function getItem(id) {
 
     try {
         let cartId = await getActiveEcart();
+        if(!cartId){
+            hideLoader();
+            return false;
+        }
         let result = await ajax("GET", "/api/ecart/get/" + cartId)
         let json = await result.json();
         if (json.success) {
@@ -355,6 +382,22 @@ back1.onclick = function() {
     openPage("page1");
 }
 
+let back2 = document.querySelector("#page3 .close");
+back2.onclick = function() {
+    //go back to home page
+    back();
+}
+
+let back3 = byId("back3");
+back3.onclick = function(e) {
+    e.target.parentElement.style.display = 'none'
+}
+
+let details = byId("details");
+details.onclick = function(e) {
+    back();
+}
+
 //fetch shortcut
 
 function ajax(type, url, payload) {
@@ -403,14 +446,15 @@ function decrement() {
 async function getActiveEcart() {
     db.query("SELECT * FROM ecart");
     let active = null;
-    db.result.active.forEach(function(each, i) {
-        if (each == true) {
-            active = db.result.ecartId[i];
-        }
-    })
+    if (db.length != 0) {
+        db.result.active.forEach(function(each, i) {
+            if (each == true) {
+                active = db.result.ecartId[i];
+            }
+        })
+    }
     if (!active) {
-        await createFirstCart();
-        return await getActiveEcart();
+        return null;
     } else {
         return active;
     }
@@ -418,14 +462,27 @@ async function getActiveEcart() {
 
 async function createCartList() {
     let cartList = byId("cartList");
+    let pay = byId("payNow");
     cartList.innerHTML = "";
     let total = 0;
     let cur = "";
 
     let cartId = await getActiveEcart();
+    if(!cartId){
+        return modal("You have no active Ecart");
+    }
     try {
         let result = await ajax("GET", "/api/ecart/get/" + cartId)
         let json = await result.json();
+        if(!json.success){
+            removeEcart(cartId);
+            return showEcarts();
+        }
+        if (json.data.paid === "false") {
+            pay.innerHTML = "Pay Now";
+        } else {
+            pay.innerHTML = "Paid";
+        }
         let items = json.data.items;
         updateBadge(items.length);
         for (let item of items) {
@@ -469,31 +526,61 @@ async function createCartList() {
 
 }
 
-function createSummaryList() {
+function removeEcart(cartId) {
+    let ecarts = db.getDB().ecart;
+    ecarts.ecartId.forEach(function(ecartId,i){
+        if(ecartId == cartId){
+            ecarts.active.splice(i,1);
+            ecarts.ecartId.splice(i,1);
+            ecarts.id.splice(i,1);
+            ecarts.name.splice(i,1);
+            ecarts.paid.splice(i,1);
+        }
+    })
+    ecarts.ecartId.forEach(function(ecartId,i){
+        if(i == 0){
+            ecarts.active[i] = "true";
+        }else{
+            ecarts.active[i] = "false";
+        }
+    })
+    let newDB = db.getDB();
+    newDB.ecart = ecarts;
+    db.setDB(newDB);
+}
+
+async function createSummaryList() {
+    let cartId = await getActiveEcart();
+    if(!cartId){
+        return modal("You have no active Ecart");
+    }
     let cartList = byId("summary");
     cartList.innerHTML = "";
-    db.query("SELECT * FROM cart ORDER BY price");
-    console.log(db.result)
-    let result = db.result;
+    let result = await ajax("GET", "/api/ecart/get/" + cartId)
+    let json = await result.json();
+    if (json.data.paid === "true") {
+        return modal("Ecart Already Paid For!");
+    }
+    let items = json.data.items;
     let total = 0;
     let cur = "";
 
-    result.id.forEach(function(each, i) {
-        let name = result.name[i];
-        let price = result.price[i];
-        let amount = result.amount[i];
-        let image = unescape(result.image[i]);
-        let hash = db.result.hash[i];
-        let currency = db.result.currency[i];
+    for (let item of items) {
+        let name = item.item_name;
+        let price = item.item_price;
+        let image = item.item_image;
+        let id = item.item_id;
+        let quantity = item.item_quantity;
+        let currency = item.item_currency;
         cur = currency;
 
         cartList.innerHTML += `<div class="summarySub">
             <img src="${image}">
-            <span>${currency} ${price * amount}</span>
+            <span>${currency} ${price * quantity}</span>
         </div>`;
 
-        total += (price * amount);
-    })
+        total += (price * quantity);
+    }
 
     cartList.innerHTML += `<div class="summarySub">
         <p id="total">Total</p>
@@ -553,7 +640,7 @@ byId("expiryDate").oninput = function() {
     this.value = formatExipry(this.value);
 }
 
-byId("payNow").onclick = function() {
+byId("payNow").onclick = async function() {
     let name = byId("cardName");
     let card = byId("card");
     let password = byId("password");
@@ -608,45 +695,36 @@ byId("payNow").onclick = function() {
     } else if (!expiryDate.checkValidity()) {
         cardSwiper.slideTo(0)
         expiryDate.focus();
-    } else if (!address.checkValidity()) {
-        cardSwiper.slideTo(1)
-        address.focus();
-    } else if (!city.checkValidity()) {
-        cardSwiper.slideTo(1)
-        city.focus();
-    } else if (!state.checkValidity()) {
-        cardSwiper.slideTo(1)
-        state.focus();
-    } else if (!zip.checkValidity()) {
-        cardSwiper.slideTo(1)
-        zip.focus();
     } else {
-        let data = {
-            name: name.value,
-            card: card.value.replaceAll(" ", ""),
-            password: password.value,
-            cvv: cvv.value,
-            expiry: expiryDate.value,
-            address: address.value,
-            city: city.value,
-            state: state.value,
-            zip: zip.value,
-            organization: org,
-            hash: db.result.hash,
-            amount: db.result.amount,
+        if(byId("payNow").innerHTML.trim() === "Paid"){
+            return modal("Already Paid");
         }
-        console.log(data);
-
         createSummaryList();
         openPage("page3");
-        byId("payBtn").onclick = function() {
+        byId("payBtn").onclick = async function() {
             showLoader();
-            //you will have to handle this properly
-            //this is just a demo
-            setTimeout(function() {
-                hideLoader();
+            let cartId = await getActiveEcart();
+            let result = await ajax("POST", "/api/ecart/pay/" + cartId, {
+                "payment_method": {
+                    "type": "sg_debit_visa_card",
+                    "fields": {
+                        "number": card.value.replaceAll(" ", ""),
+                        "expiration_month": expiryDate.value.split("/")[0],
+                        "expiration_year": expiryDate.value.split("/")[1],
+                        "cvv": cvv.value,
+                        "name": name.value
+                    }
+                },
+                "capture": true
+            })
+            let json = await result.json();
+            hideLoader();
+            if (json.success) {
                 showSuccess();
-            }, 3000)
+            } else {
+                modal("An Error Occurred!");
+                back();
+            }
         }
     }
 }
@@ -668,33 +746,42 @@ function showSuccess() {
     openPage("page1");
 }
 
-function createReceipt() {
+async function createReceipt() {
+    let cartId = await getActiveEcart();
+    if(!cartId){
+        return modal("You have no active Ecart");
+    }
     let table = byId("receipt");
     table.innerHTML = `<tr>
         <th class="left">Product</th>
         <th>Quantity</th>
         <th class="right">Price</th>
     </tr>`;
-    db.query("SELECT * FROM cart ORDER BY name ASC");
-    let result = db.result;
-    let cur = "";
-    let total = 0;
 
-    result.id.forEach(function(each, i) {
-        let name = result.name[i];
-        let price = result.price[i];
-        let amount = result.amount[i];
-        let currency = db.result.currency[i];
+    let result = await ajax("GET", "/api/ecart/get/" + cartId);
+    let json = await result.json();
+    let items = json.data.items;
+    let total = 0;
+    let cur = "";
+
+    for (let item of items) {
+        let name = item.item_name;
+        let price = item.item_price;
+        let image = item.item_image;
+        let id = item.item_id;
+        let quantity = item.item_quantity;
+        let currency = item.item_currency;
         cur = currency;
 
         table.innerHTML += `<tr>
             <td class="left">${name}</td>
-            <td>${amount}</td>
+            <td>${quantity}</td>
             <td class="right">${currency} ${price}</td>
         </tr>`;
 
-        total += (price * amount);
-    })
+        total += (price * quantity);
+    }
+
     table.innerHTML += `<br>`;
     table.innerHTML += `<tr>
         <th class="left">Total</th>
@@ -761,7 +848,7 @@ function syncDB() {
             localStorage.setItem("./EcartDB.nodb", JSON.stringify(data));
         }
         executeScript(function(response) {
-            console.log(response);
+            console.log("Syncing...");
         }, injectFunction, db.getDB());
     } catch (error) {}
 }
@@ -771,8 +858,31 @@ try {
         return localStorage["./EcartDB.nodb"];
     }
     executeScript(function(response) {
-        db.setDB(JSON.parse(response));
-        showEcarts();
+        try {
+            db.setDB(JSON.parse(response));
+            showEcarts();
+        } catch (error) {}
     }, injectFunction);
 } catch (error) {}
 
+const channel = new BroadcastChannel('sw-messages');
+
+window.onload = function() {
+    byId("ecarts").innerHTML = `<div class="noecart"><img src="./assets/img/icon/cart.svg"><p>No Ecarts</p></div>`;
+    byId("cartList").innerHTML = "";
+    channel.postMessage("isEcartSite");
+    channel.addEventListener('message', event=>{
+        let msg = event.data
+        console.log(msg);
+        if (msg.value) {} else {
+            console.log("Website not supported!");
+        }
+    }
+    );
+}
+
+const channel1 = new BroadcastChannel('count-send');
+
+channel1.addEventListener('message', event=>{
+    console.log(event);
+});
