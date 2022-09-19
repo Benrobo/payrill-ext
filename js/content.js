@@ -45,7 +45,6 @@ async function sendItemCount() {
         let json = await result.json();
         if (json.success) {
             let items = json.data.items;
-            console.log(items);
             await chrome.runtime.sendMessage({
                 action: 'setItemCount',
                 value: items.length,

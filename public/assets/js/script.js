@@ -153,6 +153,17 @@ tabs.forEach(function(tab) {
     }
 })
 
+function currencyToSymbol(currency) {
+    let all = {
+        "USD": "$",
+        "CAD": "$",
+        "GBP": "£",
+        "JPY": "¥",
+        "EUR": "€"
+    }
+    return all[currency] || (currency + " ");
+}
+
 // Create New Cart
 byId("addCart").onclick = function() {
     new Attention.Prompt({
@@ -326,7 +337,7 @@ async function getItem(id) {
                 itemSwiper.appendSlide(`<img class="swiper-slide" src="${item.item_image}">`);
 
                 byId("itemName").innerHTML = item.item_name;
-                byId("itemPrice").innerHTML = item.item_currency + " " + item.item_price;
+                byId("itemPrice").innerHTML = currencyToSymbol(item.item_currency) + item.item_price;
                 byId("itemPrice").dataset.price = item.item_price;
                 byId("eachOption").innerHTML = item.item_quantity;
                 byId("eachOption").dataset.id = id;
@@ -425,7 +436,7 @@ async function increment() {
     let currency = byId("eachOption").dataset.currency;
     count++;
 
-    byId("itemPrice").innerHTML = currency + " " + (price * count);
+    byId("itemPrice").innerHTML = currencyToSymbol(currency) + (price * count);
     byId("eachOption").innerHTML = count;
 }
 
@@ -439,7 +450,7 @@ function decrement() {
         return false;
     }
     count--;
-    byId("itemPrice").innerHTML = currency + " " + (price * count);
+    byId("itemPrice").innerHTML = currencyToSymbol(currency) + (price * count);
     byId("eachOption").innerHTML = count;
 }
 
@@ -497,7 +508,7 @@ async function createCartList() {
             cartList.innerHTML += `<div class="cart">
         <img src="${image}">
         <div class="cartsub">
-        <p>${currency} ${price}</p>
+        <p>${currencyToSymbol(currency)}${price}</p>
         <p class="cartItemName">${name}</p>
         </div>
         <div id="item_${id}" class="itemCount">${quantity}</div>
@@ -517,7 +528,7 @@ async function createCartList() {
         if (json.length == 0) {
             cartList.innerHTML = `<img class="empty" src="./assets/img/icon/cart.svg">`;
         }
-        byId("total").innerHTML = cur + " " + total;
+        byId("total").innerHTML = currencyToSymbol(cur) + total;
 
     } catch (error) {
         console.log(error);
@@ -576,7 +587,7 @@ async function createSummaryList() {
 
         cartList.innerHTML += `<div class="summarySub">
             <img src="${image}">
-            <span>${currency} ${price * quantity}</span>
+            <span>${currencyToSymbol(currency)}${price * quantity}</span>
         </div>`;
 
         total += (price * quantity);
@@ -776,7 +787,7 @@ async function createReceipt() {
         table.innerHTML += `<tr>
             <td class="left">${name}</td>
             <td>${quantity}</td>
-            <td class="right">${currency} ${price}</td>
+            <td class="right">${currencyToSymbol(currency)}${price}</td>
         </tr>`;
 
         total += (price * quantity);
@@ -880,9 +891,3 @@ window.onload = function() {
     }
     );
 }
-
-const channel1 = new BroadcastChannel('count-send');
-
-channel1.addEventListener('message', event=>{
-    console.log(event);
-});
